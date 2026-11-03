@@ -24,9 +24,9 @@ These are the rules the FuelPay database has to follow. For each one I've noted 
 
 The balance is never changed on its own. Every change also adds a ledger entry in the same database transaction, so the history is always there and the balance can be rebuilt from the ledger.
 
-## Still to decide
+## Design decisions
 
-- Does a company account belong to the organisation, or does each employee get their own?
-- Are fuel limits set per employee, per vehicle, or either?
-- Are limits daily, weekly or monthly?
-- Is an NFC tag tied to a vehicle as well as an account?
+- **Company accounts** belong to the organisation. Employees spend from it within their allowance. An account has either a customer owner or an organisation owner, never both.
+- **Fuel limits** can be set for an employee or a vehicle (one or the other, not both).
+- **Limit period** is daily, weekly or monthly, with monthly as the default. Amount spent isn't stored; it's worked out from the purchases.
+- **NFC tags** can be linked to a vehicle as well as an account. NFC cards are linked to the account only.
