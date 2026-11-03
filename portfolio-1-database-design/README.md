@@ -28,3 +28,35 @@ Each table exists because at least one business rule needs it.
 Left out on purpose:
 - **station_inventory**: no requirement needs fuel stock levels. Fuel use reports come from purchases.
 - **settlements**: paying stations is a separate process that none of the requirements cover.
+
+## Relational schema
+
+All primary keys are auto-generated IDs. Money is `NUMERIC(14,2)` (exact, no rounding errors). Times are `TIMESTAMPTZ`.
+
+- **organisations**: `organisation_id` PK, `name`, `rc_number` UNIQUE, `email` UNIQUE, `phone`, `created_at`
+- **customers**: `customer_id` PK, `first_name`, `last_name`, `email` UNIQUE, `phone` UNIQUE, `created_at`
+- **employees**: `employee_id` PK, `organisation_id` FK, `first_name`, `last_name`, `staff_number`, `is_active`. UNIQUE (`organisation_id`, `staff_number`)
+- **vehicles**: `vehicle_id` PK, `organisation_id` FK, `plate_number` UNIQUE, `make`, `model`, `is_active`
+- **customer_accounts**: `account_id` PK, `account_number` UNIQUE, `customer_id` FK (nullable), `organisation_id` FK (nullable), `balance` CHECK (>= 0), `status` (active / suspended / closed), `created_at`
+- **payment_instruments**: `instrument_id` PK, `account_id` FK, `vehicle_id` FK (nullable, tags only), `instrument_type` (card / tag), `uid` UNIQUE, `status` (active / blocked / expired), `issued_at`
+- **fuel_stations**: `station_id` PK, `station_code` UNIQUE, `name`, `city`, `state`
+- **fuel_products**: `product_id` PK, `name` UNIQUE, `price_per_litre` CHECK (> 0)
+- **fuel_allowances**: `allowance_id` PK, `employee_id` FK (nullable), `vehicle_id` FK (nullable), `limit_amount` CHECK (> 0), `period` (daily / weekly / monthly, default monthly), `is_active`, `created_at`
+- **transactions**: `transaction_id` PK, `account_id` FK, `transaction_type` (funding / purchase / reversal), `amount` CHECK (> 0), `status` (pending / successful / failed / reversed), `idempotency_key` UNIQUE, `created_at`
+- **fuel_purchases**: `purchase_id` PK, `transaction_id` FK UNIQUE, `station_id` FK, `product_id` FK, `instrument_id` FK (nullable, app payments have none), `employee_id` FK (nullable), `vehicle_id` FK (nullable), `litres` CHECK (> 0), `price_per_litre`, `created_at`
+- **account_ledger**: `entry_id` PK, `account_id` FK, `transaction_id` FK, `entry_type` (debit / credit), `amount` CHECK (> 0), `created_at`
+- **reversals**: `reversal_id` PK, `original_transaction_id` FK UNIQUE, `reversal_transaction_id` FK UNIQUE, `reason`, `created_at`
+- **audit_logs**: `audit_id` PK, `table_name`, `record_id`, `action` (insert / update / delete), `details` JSONB, `performed_by`, `created_at`
+
+### Rules across columns
+
+- An account has exactly one owner: a customer or an organisation.
+- An allowance targets exactly one of an employee or a vehicle.
+- Only tags can be linked to a vehicle; cards can't.
+- A transaction can be reversed only once (UNIQUE on `original_transaction_id`).
+
+### Why some columns are (or aren't) there
+
+- **Price is stored on each purchase** because product prices change. The purchase must keep the price actually paid.
+- **fuel_purchases has no account_id**; the account comes through its transaction. Storing it twice would let the two disagree.
+- **fuel_allowances has no organisation_id**; the organisation comes through the employee or vehicle, for the same reason.
