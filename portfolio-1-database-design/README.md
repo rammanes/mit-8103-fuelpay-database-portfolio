@@ -66,3 +66,25 @@ All primary keys are auto-generated IDs. Money is `NUMERIC(14,2)` (exact, no rou
 ![FuelPay ER diagram](diagrams/fuelpay-er-diagram.png)
 
 Drawn in dbdiagram.io using crow's foot notation. A circle means optional (zero), a bar means mandatory (one), and the crow's foot means many. audit_logs has no relationships because it records actions on any table using table_name and record_id.
+
+## Normalisation
+
+To show how the tables were arrived at, start with a single unnormalised fuel receipt:
+
+| receipt_no | customer | account_no | station | station_city | product | price | litres | cards |
+|---|---|---|---|---|---|---|---|---|
+| R001 | Ada Obi | ACC-001 | Wuse Station | Abuja | Petrol | 1000.00 | 20 | CARD-11, TAG-27 |
+
+**1NF – one value per cell.** The `cards` column holds a list, so cards and tags move to their own table with one row each (**payment_instruments**). The customer name is also split into first and last name.
+
+**2NF – no partial dependencies.** Every table uses a single-column surrogate key, so no column can depend on only part of a key. The one composite rule, UNIQUE (organisation_id, staff_number) on employees, is a uniqueness rule, not the primary key.
+
+**3NF – no transitive dependencies.** In the receipt, `station_city` depends on the station, not the receipt, and the customer depends on the account, not the receipt. Each of these becomes its own table (**fuel_stations**, **fuel_products**, **customers**, **customer_accounts**) and the purchase keeps only the foreign keys. For the same reason:
+- **fuel_purchases** has no `account_id`. The account is reached through the transaction.
+- **fuel_allowances** has no `organisation_id`. The organisation is reached through the employee or vehicle.
+
+### Deliberate exceptions
+
+- **balance** on customer_accounts could be calculated from the ledger. It's kept so balance checks are fast and so concurrent payments have a single row to lock (Portfolio 3). It's only ever changed in the same database transaction as a ledger entry, so the two can't drift apart.
+- **price_per_litre** on fuel_purchases is not a duplicate of the product price. It records the price at the time of sale, which stays the same when the product price changes.
+- **amount** on transactions matches litres × price for purchases, but fundings and reversals have no litres, so the amount is stored on the transaction itself.
