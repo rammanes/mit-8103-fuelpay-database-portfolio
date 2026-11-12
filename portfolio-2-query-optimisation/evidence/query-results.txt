@@ -1,0 +1,156 @@
+== B1. Stations in Lagos ==
+ station_code |       name       | city  
+--------------+------------------+-------
+ STN-001      | Lagos Station 1  | Lagos
+ STN-011      | Lagos Station 11 | Lagos
+(2 rows)
+
+== B2. Ten largest successful purchases ==
+ transaction_id | account_id |  amount  |    date    
+----------------+------------+----------+------------
+           8904 |        201 | 69874.00 | 2026-10-20
+           5083 |         34 | 69874.00 | 2026-08-14
+           9472 |          9 | 69524.00 | 2026-10-30
+           6579 |         69 | 69440.00 | 2026-09-09
+           5041 |        154 | 69426.00 | 2026-08-13
+           6423 |        204 | 69384.00 | 2026-09-07
+           2247 |         26 | 69342.00 | 2026-06-22
+           8595 |         74 | 69174.00 | 2026-10-15
+            433 |        200 | 69132.00 | 2026-05-20
+           7609 |        205 | 69034.00 | 2026-09-27
+(10 rows)
+
+== B3. Transactions by type and status ==
+ transaction_type |   status   | transactions | total_amount  
+------------------+------------+--------------+---------------
+ funding          | successful |          205 | 1250000000.00
+ purchase         | failed     |          301 |    9555656.50
+ purchase         | reversed   |           20 |     704536.00
+ purchase         | successful |         9679 |  298375869.00
+ reversal         | successful |           20 |     704536.00
+(5 rows)
+
+== R1. Last 10 purchases by customer 42, with station and product ==
+    date    |         station          | product  | litres | price_per_litre |  amount  
+------------+--------------------------+----------+--------+-----------------+----------
+ 2026-11-03 | Jos Station 17           | Petrol   |  35.02 |         1050.00 | 36771.00
+ 2026-10-26 | Benin City Station 18    | Petrol   |  34.87 |         1050.00 | 36613.50
+ 2026-10-23 | Ibadan Station 14        | Diesel   |  46.08 |         1250.00 | 57600.00
+ 2026-10-16 | Lagos Station 1          | Diesel   |  36.53 |         1250.00 | 45662.50
+ 2026-10-15 | Jos Station 7            | Diesel   |  15.41 |         1250.00 | 19262.50
+ 2026-09-28 | Jos Station 17           | Diesel   |  26.97 |         1250.00 | 33712.50
+ 2026-09-22 | Abuja Station 10         | Petrol   |  10.37 |         1050.00 | 10888.50
+ 2026-09-22 | Kano Station 2           | Petrol   |  24.35 |         1050.00 | 25567.50
+ 2026-09-15 | Port Harcourt Station 13 | Kerosene |  18.49 |         1400.00 | 25886.00
+ 2026-09-14 | Enugu Station 16         | Kerosene |  26.40 |         1400.00 | 36960.00
+(10 rows)
+
+== R2. Company vehicle purchases this week, with plate and driver ==
+       organisation       | plate_number |   driver    | litres |  amount  |    date    
+--------------------------+--------------+-------------+--------+----------+------------
+ Savannah Agro Fleet      | FP012KJA     | Musa Umeh   |  48.43 | 50851.50 | 2026-11-12
+ Lagoon Couriers Ltd      | FP001KJA     | Bola Ojo    |  23.10 | 28875.00 | 2026-11-12
+ Delta Transport Services | FP033KJA     | Funmi Obi   |  19.44 | 20412.00 | 2026-11-12
+ Savannah Agro Fleet      | FP012KJA     | Sani Bakare |  45.31 | 56637.50 | 2026-11-12
+ Savannah Agro Fleet      | FP027KJA     | Funmi Ojo   |  28.94 | 30387.00 | 2026-11-12
+ Lagoon Couriers Ltd      | FP001KJA     | Hauwa Obi   |  42.42 | 59388.00 | 2026-11-12
+ Sahel Haulage Ltd        | FP005KJA     | Sani Garba  |  31.97 | 33568.50 | 2026-11-12
+ Savannah Agro Fleet      | FP007KJA     | Funmi Obi   |  32.94 | 34587.00 | 2026-11-12
+ Plateau Logistics Ltd    | FP004KJA     | Amaka Obi   |  17.44 | 18312.00 | 2026-11-11
+ Delta Transport Services | FP033KJA     | Amaka Ojo   |   8.75 |  9187.50 | 2026-11-11
+(10 rows)
+
+== R3. Reversals with the original and refund amounts ==
+ reversal_id | original_id | original_amount | original_status | refund_id | refund_amount |         reason          
+-------------+-------------+-----------------+-----------------+-----------+---------------+-------------------------
+           1 |        4108 |         7623.00 | reversed        |     10206 |       7623.00 | Pump failed to dispense
+           2 |        8577 |        38976.00 | reversed        |     10207 |      38976.00 | Pump failed to dispense
+           3 |        7114 |        17188.50 | reversed        |     10208 |      17188.50 | Pump failed to dispense
+           4 |        4556 |        50525.00 | reversed        |     10209 |      50525.00 | Pump failed to dispense
+           5 |        9510 |        21924.00 | reversed        |     10210 |      21924.00 | Pump failed to dispense
+           6 |        7254 |        39333.00 | reversed        |     10211 |      39333.00 | Pump failed to dispense
+           7 |        3296 |        42587.50 | reversed        |     10212 |      42587.50 | Pump failed to dispense
+           8 |        2852 |        51487.50 | reversed        |     10213 |      51487.50 | Pump failed to dispense
+           9 |        6588 |        49187.50 | reversed        |     10214 |      49187.50 | Pump failed to dispense
+          10 |        8923 |        39564.00 | reversed        |     10215 |      39564.00 | Pump failed to dispense
+(10 rows)
+
+== S1. Account statement for account 42 with running balance (last 10 entries) ==
+    date    | transaction_type | entry_type |  amount  | running_balance 
+------------+------------------+------------+----------+-----------------
+ 2026-11-03 | purchase         | debit      | 36771.00 |      3950002.00
+ 2026-10-26 | purchase         | debit      | 36613.50 |      3986773.00
+ 2026-10-23 | purchase         | debit      | 57600.00 |      4023386.50
+ 2026-10-16 | purchase         | debit      | 45662.50 |      4080986.50
+ 2026-10-15 | purchase         | debit      | 19262.50 |      4126649.00
+ 2026-09-28 | purchase         | debit      | 33712.50 |      4145911.50
+ 2026-09-22 | purchase         | debit      | 10888.50 |      4179624.00
+ 2026-09-22 | purchase         | debit      | 25567.50 |      4190512.50
+ 2026-09-15 | purchase         | debit      | 25886.00 |      4216080.00
+ 2026-09-14 | purchase         | debit      | 36960.00 |      4241966.00
+(10 rows)
+
+== S2. Corporate fuel spending per organisation per month ==
+       organisation       |   month    | purchases | litres  |   spent    
+--------------------------+------------+-----------+---------+------------
+ Delta Transport Services | 2026-05-01 |        49 | 1344.33 | 1484714.50
+ Delta Transport Services | 2026-06-01 |        95 | 2714.66 | 3079209.00
+ Delta Transport Services | 2026-07-01 |        76 | 2212.03 | 2515415.50
+ Delta Transport Services | 2026-08-01 |        93 | 2544.97 | 2828666.50
+ Delta Transport Services | 2026-09-01 |       108 | 3075.23 | 3487231.50
+ Delta Transport Services | 2026-10-01 |       110 | 2942.90 | 3242983.00
+ Delta Transport Services | 2026-11-01 |        34 |  877.06 |  991784.50
+ Lagoon Couriers Ltd      | 2026-05-01 |        43 | 1188.37 | 1320909.50
+ Lagoon Couriers Ltd      | 2026-06-01 |        89 | 2539.86 | 2825392.50
+ Lagoon Couriers Ltd      | 2026-07-01 |        89 | 2441.59 | 2710602.50
+ Lagoon Couriers Ltd      | 2026-08-01 |       102 | 2643.99 | 2931865.00
+ Lagoon Couriers Ltd      | 2026-09-01 |        88 | 2434.44 | 2691732.50
+(12 rows)
+
+== S3. Station activity in the last 30 days, busiest first ==
+ station_code |          name           | purchases | litres  |   revenue    | rank 
+--------------+-------------------------+-----------+---------+--------------+------
+ STN-009      | Abeokuta Station 9      |        97 | 2741.11 | 3003115.5000 |    1
+ STN-015      | Kaduna Station 15       |        92 | 2739.01 | 3104578.5000 |    2
+ STN-004      | Ibadan Station 4        |        87 | 2573.33 | 2850597.0000 |    3
+ STN-011      | Lagos Station 11        |        85 | 2476.21 | 2770145.5000 |    4
+ STN-016      | Enugu Station 16        |        89 | 2407.99 | 2784988.0000 |    5
+ STN-006      | Enugu Station 6         |        86 | 2402.51 | 2703278.5000 |    6
+ STN-003      | Port Harcourt Station 3 |        83 | 2290.70 | 2580126.5000 |    7
+ STN-012      | Kano Station 12         |        87 | 2286.49 | 2539970.0000 |    8
+ STN-020      | Abuja Station 20        |        83 | 2231.88 | 2455104.5000 |    9
+ STN-005      | Kaduna Station 5        |        82 | 2196.46 | 2439627.0000 |   10
+(10 rows)
+
+== S4. Fuel consumption by product per month ==
+   month    | product  |  litres  
+------------+----------+----------
+ 2026-05-01 | Diesel   |  5727.06
+ 2026-05-01 | Kerosene |  1128.74
+ 2026-05-01 | Petrol   | 15829.81
+ 2026-06-01 | Diesel   | 10845.37
+ 2026-06-01 | Kerosene |  2106.94
+ 2026-06-01 | Petrol   | 31688.27
+ 2026-07-01 | Diesel   | 11354.81
+ 2026-07-01 | Kerosene |  2521.30
+ 2026-07-01 | Petrol   | 30354.96
+ 2026-08-01 | Diesel   | 10905.11
+ 2026-08-01 | Kerosene |  2420.80
+ 2026-08-01 | Petrol   | 32479.63
+ 2026-09-01 | Diesel   | 11100.48
+ 2026-09-01 | Kerosene |  2361.27
+ 2026-09-01 | Petrol   | 33145.15
+ 2026-10-01 | Diesel   | 11355.49
+ 2026-10-01 | Kerosene |  2216.82
+ 2026-10-01 | Petrol   | 31726.75
+ 2026-11-01 | Diesel   |  4472.59
+ 2026-11-01 | Kerosene |   834.35
+ 2026-11-01 | Petrol   | 13206.82
+(21 rows)
+
+== S5. Employees who went over their monthly allowance this month ==
+ staff_number | employee  | limit_amount |    spent    
+--------------+-----------+--------------+-------------
+ EMP0007      | Funmi Ojo |    300000.00 | 362070.5000
+(1 row)
+

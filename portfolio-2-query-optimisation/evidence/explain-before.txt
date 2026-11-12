@@ -1,0 +1,61 @@
+== Q1. Customer transaction history (account 42, last 90 days) ==
+                                                   QUERY PLAN                                                    
+-----------------------------------------------------------------------------------------------------------------
+ Sort  (cost=325.90..325.95 rows=19 width=41) (actual time=2.501..2.503 rows=16 loops=1)
+   Sort Key: created_at DESC
+   Sort Method: quicksort  Memory: 26kB
+   Buffers: shared hit=124
+   ->  Seq Scan on transactions  (cost=0.00..325.50 rows=19 width=41) (actual time=1.163..2.378 rows=16 loops=1)
+         Filter: ((account_id = 42) AND (created_at >= (now() - '90 days'::interval)))
+         Rows Removed by Filter: 10209
+         Buffers: shared hit=121
+ Planning:
+   Buffers: shared hit=131
+ Planning Time: 1.144 ms
+ Execution Time: 2.832 ms
+(12 rows)
+
+== Q2. Station activity (station 7, last 30 days) ==
+                                                    QUERY PLAN                                                    
+------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=316.38..316.39 rows=1 width=40) (actual time=3.933..3.934 rows=1 loops=1)
+   Buffers: shared hit=122
+   ->  Seq Scan on fuel_purchases  (cost=0.00..315.98 rows=80 width=6) (actual time=0.062..3.835 rows=78 loops=1)
+         Filter: ((station_id = 7) AND (created_at >= (now() - '30 days'::interval)))
+         Rows Removed by Filter: 9621
+         Buffers: shared hit=122
+ Planning:
+   Buffers: shared hit=49
+ Planning Time: 0.488 ms
+ Execution Time: 3.998 ms
+(10 rows)
+
+== Q3. Account statement (ledger for account 42) ==
+                                                    QUERY PLAN                                                     
+-------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=218.08..218.18 rows=39 width=21) (actual time=1.737..1.741 rows=39 loops=1)
+   Sort Key: created_at
+   Sort Method: quicksort  Memory: 26kB
+   Buffers: shared hit=93
+   ->  Seq Scan on account_ledger  (cost=0.00..217.05 rows=39 width=21) (actual time=0.042..1.675 rows=39 loops=1)
+         Filter: (account_id = 42)
+         Rows Removed by Filter: 9885
+         Buffers: shared hit=93
+ Planning:
+   Buffers: shared hit=28
+ Planning Time: 0.306 ms
+ Execution Time: 1.784 ms
+(12 rows)
+
+== Q4. Payment lookup by idempotency key (already indexed by its UNIQUE constraint) ==
+                                                                QUERY PLAN                                                                 
+-------------------------------------------------------------------------------------------------------------------------------------------
+ Index Scan using uq_transactions_idempotency on transactions  (cost=0.29..8.30 rows=1 width=18) (actual time=0.028..0.029 rows=1 loops=1)
+   Index Cond: ((idempotency_key)::text = 'PUR-00005000'::text)
+   Buffers: shared hit=3
+ Planning:
+   Buffers: shared hit=6
+ Planning Time: 0.353 ms
+ Execution Time: 0.058 ms
+(7 rows)
+

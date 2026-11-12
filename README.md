@@ -26,8 +26,8 @@ FuelPay Network is a simulated fintech platform that provides cashless fuel paym
 
 | # | Portfolio | Status |
 |---|---|---|
-| 1 | Database Design and Modelling | Not started |
-| 2 | Query Processing and Optimisation | Not started |
+| 1 | [Database Design and Modelling](portfolio-1-database-design/) | Complete |
+| 2 | [Query Processing and Optimisation](portfolio-2-query-optimisation/) | Complete |
 | 3 | Transactions and Concurrency | Not started |
 | 4 | NoSQL and Advanced Data Models | Not started |
 | 5 | Distributed and Cloud Databases | Not started |

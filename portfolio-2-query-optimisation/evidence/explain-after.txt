@@ -1,0 +1,70 @@
+== Q1. Customer transaction history (account 42, last 90 days) ==
+                                                                  QUERY PLAN                                                                  
+----------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=56.44..56.49 rows=19 width=41) (actual time=0.078..0.080 rows=16 loops=1)
+   Sort Key: created_at DESC
+   Sort Method: quicksort  Memory: 26kB
+   Buffers: shared hit=20 read=2
+   ->  Bitmap Heap Scan on transactions  (cost=4.48..56.04 rows=19 width=41) (actual time=0.031..0.055 rows=16 loops=1)
+         Recheck Cond: ((account_id = 42) AND (created_at >= (now() - '90 days'::interval)))
+         Heap Blocks: exact=14
+         Buffers: shared hit=17 read=2
+         ->  Bitmap Index Scan on idx_transactions_account_date  (cost=0.00..4.48 rows=19 width=0) (actual time=0.021..0.022 rows=16 loops=1)
+               Index Cond: ((account_id = 42) AND (created_at >= (now() - '90 days'::interval)))
+               Buffers: shared hit=3 read=2
+ Planning:
+   Buffers: shared hit=155 read=1
+ Planning Time: 0.531 ms
+ Execution Time: 0.110 ms
+(15 rows)
+
+== Q2. Station activity (station 7, last 30 days) ==
+                                                                QUERY PLAN                                                                 
+-------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=121.71..121.72 rows=1 width=40) (actual time=0.144..0.144 rows=1 loops=1)
+   Buffers: shared hit=56 read=2
+   ->  Bitmap Heap Scan on fuel_purchases  (cost=5.11..121.31 rows=80 width=6) (actual time=0.027..0.126 rows=78 loops=1)
+         Recheck Cond: ((station_id = 7) AND (created_at >= (now() - '30 days'::interval)))
+         Heap Blocks: exact=56
+         Buffers: shared hit=56 read=2
+         ->  Bitmap Index Scan on idx_purchases_station_date  (cost=0.00..5.09 rows=80 width=0) (actual time=0.017..0.018 rows=78 loops=1)
+               Index Cond: ((station_id = 7) AND (created_at >= (now() - '30 days'::interval)))
+               Buffers: shared read=2
+ Planning:
+   Buffers: shared hit=65 read=1
+ Planning Time: 0.222 ms
+ Execution Time: 0.204 ms
+(13 rows)
+
+== Q3. Account statement (ledger for account 42) ==
+                                                               QUERY PLAN                                                               
+----------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=79.13..79.23 rows=39 width=21) (actual time=0.079..0.081 rows=39 loops=1)
+   Sort Key: created_at
+   Sort Method: quicksort  Memory: 26kB
+   Buffers: shared hit=33 read=2
+   ->  Bitmap Heap Scan on account_ledger  (cost=4.59..78.10 rows=39 width=21) (actual time=0.020..0.072 rows=39 loops=1)
+         Recheck Cond: (account_id = 42)
+         Heap Blocks: exact=33
+         Buffers: shared hit=33 read=2
+         ->  Bitmap Index Scan on idx_ledger_account_date  (cost=0.00..4.58 rows=39 width=0) (actual time=0.011..0.011 rows=39 loops=1)
+               Index Cond: (account_id = 42)
+               Buffers: shared read=2
+ Planning:
+   Buffers: shared hit=46 read=1
+ Planning Time: 0.112 ms
+ Execution Time: 0.089 ms
+(15 rows)
+
+== Q4. Payment lookup by idempotency key (already indexed by its UNIQUE constraint) ==
+                                                                QUERY PLAN                                                                 
+-------------------------------------------------------------------------------------------------------------------------------------------
+ Index Scan using uq_transactions_idempotency on transactions  (cost=0.29..8.30 rows=1 width=18) (actual time=0.019..0.019 rows=1 loops=1)
+   Index Cond: ((idempotency_key)::text = 'PUR-00005000'::text)
+   Buffers: shared hit=3
+ Planning:
+   Buffers: shared hit=6
+ Planning Time: 0.039 ms
+ Execution Time: 0.025 ms
+(7 rows)
+
