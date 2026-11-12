@@ -60,3 +60,9 @@ All primary keys are auto-generated IDs. Money is `NUMERIC(14,2)` (exact, no rou
 - **Price is stored on each purchase** because product prices change. The purchase must keep the price actually paid.
 - **fuel_purchases has no account_id**; the account comes through its transaction. Storing it twice would let the two disagree.
 - **fuel_allowances has no organisation_id**; the organisation comes through the employee or vehicle, for the same reason.
+
+## ER diagram
+
+![FuelPay ER diagram](diagrams/fuelpay-er-diagram.png)
+
+Drawn in dbdiagram.io using crow's foot notation. A circle means optional (zero), a bar means mandatory (one), and the crow's foot means many. audit_logs has no relationships because it records actions on any table using table_name and record_id.
