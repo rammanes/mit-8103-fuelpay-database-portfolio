@@ -88,3 +88,31 @@ To show how the tables were arrived at, start with a single unnormalised fuel re
 - **balance** on customer_accounts could be calculated from the ledger. It's kept so balance checks are fast and so concurrent payments have a single row to lock (Portfolio 3). It's only ever changed in the same database transaction as a ledger entry, so the two can't drift apart.
 - **price_per_litre** on fuel_purchases is not a duplicate of the product price. It records the price at the time of sale, which stays the same when the product price changes.
 - **amount** on transactions matches litres × price for purchases, but fundings and reversals have no litres, so the amount is stored on the transaction itself.
+
+## Implementation
+
+PostgreSQL 17 runs in Docker (see `docker-compose.yml` in the repo root). Port 5433 is used on the host because a local PostgreSQL install already uses 5432.
+
+| Script | What it does |
+|---|---|
+| [sql/01_create_tables.sql](sql/01_create_tables.sql) | Creates the 14 tables with primary keys and data types |
+| [sql/02_constraints.sql](sql/02_constraints.sql) | Adds 19 foreign keys, 14 UNIQUE and 19 CHECK constraints, each named after the rule it enforces |
+| [sql/03_seed_data.sql](sql/03_seed_data.sql) | Loads synthetic data: 205 accounts, 10,000 purchase attempts over 6 months, about 3% failed, 20 reversals |
+| [sql/04_validation_tests.sql](sql/04_validation_tests.sql) | Tries to break each business rule and checks which constraint stops it |
+
+To run:
+
+```bash
+docker compose up -d
+for f in portfolio-1-database-design/sql/0*.sql; do
+  docker exec -i fuelpay-postgres psql -U fuelpay -d fuelpay -v ON_ERROR_STOP=1 < "$f"
+done
+```
+
+The seed balances are not typed in. Every funding, purchase and reversal writes a ledger entry, and each balance is then calculated from the ledger.
+
+## Testing
+
+[evidence/validation-results.txt](evidence/validation-results.txt) shows the test output. Each of the 15 tests tries to insert or change data that breaks a rule (duplicate email, card linked to a vehicle, negative balance, duplicate idempotency key, reversing a transaction twice, and so on). A test passes only if the database rejects it with the expected constraint. The tests run inside a transaction that is rolled back, so they leave no data behind.
+
+The same file also checks the seeded data: every balance matches its ledger, every successful purchase has a pump record, and every reversed purchase has a reversal record.

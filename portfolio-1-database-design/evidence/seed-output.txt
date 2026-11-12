@@ -1,0 +1,53 @@
+BEGIN
+ setseed 
+---------
+ 
+(1 row)
+
+TRUNCATE TABLE
+INSERT 0 5
+INSERT 0 200
+INSERT 0 50
+INSERT 0 40
+INSERT 0 20
+INSERT 0 3
+INSERT 0 200
+INSERT 0 5
+INSERT 0 200
+INSERT 0 40
+INSERT 0 50
+INSERT 0 20
+INSERT 0 205
+SELECT 10000
+ALTER TABLE
+UPDATE 10000
+UPDATE 9021
+INSERT 0 10000
+INSERT 0 9699
+SELECT 20
+UPDATE 20
+INSERT 0 20
+INSERT 0 20
+INSERT 0 20
+INSERT 0 9924
+UPDATE 205
+COMMIT
+ANALYZE
+     table_name      | rows  
+---------------------+-------
+ organisations       |     5
+ customers           |   200
+ employees           |    50
+ vehicles            |    40
+ customer_accounts   |   205
+ payment_instruments |   240
+ fuel_stations       |    20
+ fuel_products       |     3
+ fuel_allowances     |    70
+ transactions        | 10225
+ fuel_purchases      |  9699
+ account_ledger      |  9924
+ reversals           |    20
+ audit_logs          |    20
+(14 rows)
+

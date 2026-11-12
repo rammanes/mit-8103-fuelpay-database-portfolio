@@ -1,0 +1,29 @@
+BEGIN
+CREATE FUNCTION
+ test |                       rule                        |                       result                        
+------+---------------------------------------------------+-----------------------------------------------------
+ T01  | BR-001 duplicate customer email                   | PASS: rejected by uq_customers_email
+ T02  | BR-003 account with two owners                    | PASS: rejected by chk_accounts_one_owner
+ T03  | BR-003 account with no owner                      | PASS: rejected by chk_accounts_one_owner
+ T04  | BR-004 duplicate card UID                         | PASS: rejected by uq_instruments_uid
+ T05  | BR-004 card linked to a vehicle                   | PASS: rejected by chk_instruments_vehicle_tag_only
+ T06  | BR-006 allowance for employee and vehicle         | PASS: rejected by chk_allowances_one_target
+ T07  | BR-006 allowance with zero limit                  | PASS: rejected by chk_allowances_limit_positive
+ T08  | BR-007 purchase at a station that does not exist  | PASS: rejected by fk_purchases_station
+ T09  | BR-008 negative balance                           | PASS: rejected by chk_accounts_balance_non_negative
+ T10  | BR-009 duplicate idempotency key                  | PASS: rejected by uq_transactions_idempotency
+ T11  | BR-010 unknown transaction status                 | PASS: rejected by chk_transactions_status
+ T12  | BR-010 zero amount                                | PASS: rejected by chk_transactions_amount_positive
+ T13  | BR-011 reversing a transaction twice              | PASS: rejected by uq_reversals_original
+ T14  | One payment linked to two purchases               | PASS: rejected by uq_purchases_transaction
+ T15  | BR-012/013 deleting a customer who has an account | PASS: rejected by fk_accounts_customer
+(15 rows)
+
+ROLLBACK
+                    check_name                    | problems 
+--------------------------------------------------+----------
+ Accounts whose balance does not match the ledger |        0
+ Successful purchases with no pump record         |        0
+ Reversed purchases with no reversal record       |        0
+(3 rows)
+
