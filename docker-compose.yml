@@ -11,5 +11,14 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  mongo:
+    image: mongo:8.2   # 8.0 refuses to start on Docker Desktop kernel 7.0.x (SERVER-121912)
+    container_name: fuelpay-mongo
+    ports:
+      - "127.0.0.1:27018:27017"   # local only; 27017 is taken by a local MongoDB install
+    volumes:
+      - mongodata:/data/db
+
 volumes:
   pgdata:
+  mongodata:

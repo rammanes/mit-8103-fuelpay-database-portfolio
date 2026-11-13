@@ -1,0 +1,3 @@
+Collections: payment_events, pump_telemetry
+payment_events indexes: _id_, transaction_ref_1, station_code_1_started_at_-1
+pump_telemetry indexes: _id_, station_code_1_recorded_at_-1

@@ -1,0 +1,238 @@
+
+== Q1. Full event history of payment PUR-00000007 ==
+{
+  transaction_ref: 'PUR-00000007',
+  account_number: 'FPC0000006',
+  station_code: 'STN-017',
+  channel: 'nfc_tag',
+  started_at: ISODate('2026-11-07T20:15:52.013Z'),
+  outcome: 'approved',
+  events: [
+    {
+      type: 'tag_read',
+      at: ISODate('2026-11-07T20:15:52.013Z')
+    },
+    {
+      type: 'authorised',
+      at: ISODate('2026-11-07T20:15:59.506Z')
+    },
+    {
+      type: 'pump_started',
+      at: ISODate('2026-11-07T20:16:29.506Z')
+    },
+    {
+      type: 'pump_stopped',
+      at: ISODate('2026-11-07T20:18:59.506Z'),
+      litres: 28.45
+    },
+    {
+      type: 'receipt_printed',
+      at: ISODate('2026-11-07T20:19:11.506Z')
+    }
+  ],
+  device: {
+    reader_id: 'RDR-017-1',
+    firmware: '3.2.0',
+    vehicle_plate: 'FP016KJA'
+  }
+}
+
+== Q2. A mobile app payment and an NFC tag payment have different fields ==
+[
+  {
+    transaction_ref: 'PUR-00000004',
+    channel: 'mobile_app',
+    device: {
+      platform: 'ios',
+      app_version: '2.4.0',
+      phone_model: 'Samsung A15'
+    },
+    location: {
+      type: 'Point',
+      coordinates: [
+        4.721120852381513,
+        8.253799171305168
+      ]
+    }
+  },
+  {
+    transaction_ref: 'PUR-00000001',
+    channel: 'nfc_tag',
+    device: {
+      reader_id: 'RDR-011-1',
+      firmware: '3.2.0',
+      vehicle_plate: 'FP021KJA'
+    }
+  }
+]
+
+== Q3. Declined payments by reason ==
+[
+  {
+    _id: 'insufficient_funds',
+    payments: 82
+  },
+  {
+    _id: 'card_blocked',
+    payments: 41
+  },
+  {
+    _id: 'allowance_exceeded',
+    payments: 32
+  }
+]
+
+== Q4. Approval rate and timeouts per channel ==
+[
+  {
+    _id: 'mobile_app',
+    payments: 287,
+    with_timeout: 34,
+    approval_rate_pct: 93
+  },
+  {
+    _id: 'nfc_card',
+    payments: 1220,
+    with_timeout: 125,
+    approval_rate_pct: 92.5
+  },
+  {
+    _id: 'nfc_tag',
+    payments: 493,
+    with_timeout: 57,
+    approval_rate_pct: 91.1
+  }
+]
+
+== Q5. Average seconds from start to authorisation, per channel ==
+[
+  {
+    _id: 'mobile_app',
+    avg_seconds: 72.9
+  },
+  {
+    _id: 'nfc_card',
+    avg_seconds: 33.1
+  },
+  {
+    _id: 'nfc_tag',
+    avg_seconds: 13.6
+  }
+]
+
+== Q6. Pump alerts in the last 7 days ==
+[
+  {
+    _id: {
+      station: 'STN-008',
+      pump: 5,
+      alert: 'LOW_TANK'
+    },
+    times: 3
+  },
+  {
+    _id: {
+      station: 'STN-001',
+      pump: 3,
+      alert: 'METER_DRIFT'
+    },
+    times: 2
+  },
+  {
+    _id: {
+      station: 'STN-006',
+      pump: 4,
+      alert: 'LOW_TANK'
+    },
+    times: 2
+  },
+  {
+    _id: {
+      station: 'STN-007',
+      pump: 2,
+      alert: 'LOW_TANK'
+    },
+    times: 2
+  },
+  {
+    _id: {
+      station: 'STN-008',
+      pump: 4,
+      alert: 'METER_DRIFT'
+    },
+    times: 2
+  },
+  {
+    _id: {
+      station: 'STN-008',
+      pump: 4,
+      alert: 'LOW_TANK'
+    },
+    times: 2
+  },
+  {
+    _id: {
+      station: 'STN-008',
+      pump: 6,
+      alert: 'METER_DRIFT'
+    },
+    times: 2
+  },
+  {
+    _id: {
+      station: 'STN-013',
+      pump: 3,
+      alert: 'LOW_TANK'
+    },
+    times: 2
+  },
+  {
+    _id: {
+      station: 'STN-013',
+      pump: 5,
+      alert: 'LOW_TANK'
+    },
+    times: 2
+  },
+  {
+    _id: {
+      station: 'STN-017',
+      pump: 5,
+      alert: 'LOW_TANK'
+    },
+    times: 2
+  }
+]
+
+== Q7. Readings per pump model ==
+[
+  {
+    _id: 'PX-100',
+    readings: 332,
+    avg_flow_lpm: 39.9,
+    avg_tank_level_pct: null
+  },
+  {
+    _id: 'PX-200',
+    readings: 330,
+    avg_flow_lpm: 39.8,
+    avg_tank_level_pct: null
+  },
+  {
+    _id: 'PX-300',
+    readings: 338,
+    avg_flow_lpm: 40.1,
+    avg_tank_level_pct: 48.5
+  }
+]
+
+== Q8. Plan for "station STN-007, last 7 days" ==
+{
+  plan: 'FETCH <- IXSCAN (station_code_1_started_at_-1)',
+  documents_returned: 22,
+  documents_examined: 22,
+  collection_size: 2000
+}
+
+== Q9. Insert a payment with no events ==
+REJECTED: Document failed validation
