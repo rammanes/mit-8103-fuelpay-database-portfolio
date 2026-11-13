@@ -1,0 +1,36 @@
+== Scenario 1: no concurrency control (lost update) ==
+Each session reads the balance, checks it is enough, then writes back balance - 15000.
+04:26:22.438  Session A: read balance N20000.00, enough for N15,000
+04:26:23.000  Session B: read balance N20000.00, enough for N15,000
+04:26:24.457  Session A: committed, set balance to N5000.00
+04:26:25.012  Session B: committed, set balance to N5000.00
+Result: balance N5000.00 | balance worked out from the ledger N-10000.00 | N15,000 payments recorded: 2
+
+== Scenario 2: SELECT ... FOR UPDATE (row lock) ==
+Each session locks the account row before reading the balance.
+04:26:25.462  Session A: asking for a lock on the account
+04:26:25.464  Session A: got the lock, balance is N20000.00
+04:26:25.970  Session B: asking for a lock on the account
+04:26:27.474  Session A: paid N15,000 and committed
+04:26:27.474  Session B: got the lock, balance is N5000.00
+04:26:29.478  Session B: not enough money, payment declined
+Result: balance N5000.00 | balance worked out from the ledger N5000.00 | N15,000 payments recorded: 1
+
+== Scenario 3: isolation level READ COMMITTED ==
+Session A reads the balance twice in one transaction. Session B pays N15,000 in between.
+04:26:29.924  Session A: first read: balance N20000.00
+04:26:30.414  Session B: paid N15,000 and committed
+04:26:31.929  Session A: second read: balance N5000.00
+04:26:31.929  Session A: now tries to take N10,000 from the balance
+04:26:31.932  Session A: rows updated: 0
+04:26:31.932  Session A: rolled back (demo only, nothing saved)
+
+== Scenario 3: isolation level REPEATABLE READ ==
+Session A reads the balance twice in one transaction. Session B pays N15,000 in between.
+04:26:32.226  Session A: first read: balance N20000.00
+04:26:32.756  Session B: paid N15,000 and committed
+04:26:34.229  Session A: second read: balance N20000.00
+04:26:34.229  Session A: now tries to take N10,000 from the balance
+04:26:34.232  Session A: rolled back (demo only, nothing saved)
+  ERROR:  could not serialize access due to concurrent update
+

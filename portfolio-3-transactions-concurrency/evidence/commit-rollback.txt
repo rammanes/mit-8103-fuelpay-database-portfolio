@@ -1,0 +1,60 @@
+== Setup: new demo account funded with N20,000 ==
+ account_id | account_number | balance  
+------------+----------------+----------
+        218 | DEMO-1213      | 20000.00
+(1 row)
+
+== 1. COMMIT: a N5,000 diesel purchase (4 litres at N1,250) ==
+BEGIN
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+UPDATE 1
+COMMIT
+After COMMIT the balance is N15,000 and the payment is saved:
+ balance  | transaction_id | amount  |   status   
+----------+----------------+---------+------------
+ 15000.00 |          10258 | 5000.00 | successful
+(1 row)
+
+== 2. ROLLBACK: a N3,000 payment cancelled before it finishes ==
+BEGIN
+INSERT 0 1
+INSERT 0 1
+UPDATE 1
+Inside the transaction the balance shows N12,000:
+ balance  
+----------
+ 12000.00
+(1 row)
+
+ROLLBACK
+After ROLLBACK the balance is back to N15,000 and the payment does not exist:
+ balance  | payments_saved 
+----------+----------------
+ 15000.00 |              0
+(1 row)
+
+== 3. Automatic rollback: a N50,000 payment fails halfway through ==
+The transaction row and ledger entry are inserted first, then the balance update breaks the CHECK rule.
+BEGIN
+INSERT 0 1
+INSERT 0 1
+ERROR:  new row for relation "customer_accounts" violates check constraint "chk_accounts_balance_non_negative"
+DETAIL:  Failing row contains (218, DEMO-1213, 212, null, -35000.00, active, 2026-11-13 04:26:05.441019+00).
+ROLLBACK
+Nothing from the failed payment was kept (atomicity):
+ balance  | payments_saved | ledger_entries_saved 
+----------+----------------+----------------------
+ 15000.00 |              0 |                    0
+(1 row)
+
+== 4. Duplicate request: the terminal retries payment 1 with the same idempotency key ==
+ERROR:  duplicate key value violates unique constraint "uq_transactions_idempotency"
+DETAIL:  Key (idempotency_key)=(DEMO-PAY-218-1) already exists.
+The retry was rejected, so the customer was only charged once:
+ payments_with_this_key 
+------------------------
+                      1
+(1 row)
+
