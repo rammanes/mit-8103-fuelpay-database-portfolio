@@ -17,7 +17,7 @@ The automatic rollback is the important one. The first two inserts had succeeded
 
 ## 2. The ₦20,000 concurrent payment problem
 
-Script: [sql/02_concurrency_demo.sh](sql/02_concurrency_demo.sh). Output: [evidence/concurrency-demo.txt](evidence/concurrency-demo.txt).
+Script: [sql/02_concurrency_demo.sh](sql/02_concurrency_demo.sh). Output: [evidence/concurrency-demo.txt](evidence/concurrency-demo.txt), screenshot: [evidence/concurrency-demo.png](evidence/concurrency-demo.png).
 
 Scenario: an account has ₦20,000. Two stations try to take ₦15,000 at almost the same moment (session B starts half a second after A). Only one of them should succeed.
 
