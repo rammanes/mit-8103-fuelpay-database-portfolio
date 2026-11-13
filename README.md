@@ -30,7 +30,7 @@ FuelPay Network is a simulated fintech platform that provides cashless fuel paym
 | 2 | [Query Processing and Optimisation](portfolio-2-query-optimisation/) | Complete |
 | 3 | [Transactions and Concurrency](portfolio-3-transactions-concurrency/) | Complete |
 | 4 | [NoSQL and Advanced Data Models](portfolio-4-nosql/) | Complete |
-| 5 | Distributed and Cloud Databases | Not started |
+| 5 | [Distributed and Cloud Databases](portfolio-5-distributed-cloud/) | Complete |
 
 Each portfolio folder has its own README, SQL/configuration files and evidence. It is added to the repository when work on that portfolio begins.
 

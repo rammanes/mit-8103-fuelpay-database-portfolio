@@ -1,0 +1,75 @@
+Setting up: removing any old pair and starting a new primary and replica...
+Loading the Portfolio 1 schema and data into the PRIMARY only...
+
+== 1. Which server is which ==
+primary:
+ is_read_only_standby 
+----------------------
+ f
+(1 row)
+
+replica:
+ is_read_only_standby 
+----------------------
+ t
+(1 row)
+
+== 2. The primary sees the replica connected and streaming ==
+ application_name |   state   | sync_state 
+------------------+-----------+------------
+ walreceiver      | streaming | async
+(1 row)
+
+== 3. Data loaded on the primary is already on the replica ==
+primary:
+ tables | transactions | total_balances 
+--------+--------------+----------------
+     14 |        10225 |   951624131.00
+(1 row)
+
+replica:
+ tables | transactions | total_balances 
+--------+--------------+----------------
+     14 |        10225 |   951624131.00
+(1 row)
+
+== 4. A new N10,000 funding payment on the primary appears on the replica ==
+read from the replica:
+   idempotency_key    |  amount  |          created_at           
+----------------------+----------+-------------------------------
+ REPL-TEST-1794601038 | 10000.00 | 2026-11-13 20:17:19.069845+00
+(1 row)
+
+   state   |   replay_lag    
+-----------+-----------------
+ streaming | 00:00:00.000716
+(1 row)
+
+== 5. The replica refuses writes ==
+ERROR:  cannot execute UPDATE in a read-only transaction
+
+== 6. Failover: the primary goes down and the replica is promoted ==
+primary container stopped
+ promoted 
+----------
+ t
+(1 row)
+
+ is_read_only_standby 
+----------------------
+ f
+(1 row)
+
+the promoted server now accepts payments:
+ account_id |  balance   
+------------+------------
+          1 | 4199540.00
+(1 row)
+
+           idempotency_key           |  amount  
+-------------------------------------+----------
+ REPL-TEST-1794601038                | 10000.00
+ REPL-TEST-1794601038-AFTER-FAILOVER |  5000.00
+(2 rows)
+
+The old primary is left stopped. Re-run this script to rebuild the pair.

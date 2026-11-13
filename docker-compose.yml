@@ -19,6 +19,39 @@ services:
     volumes:
       - mongodata:/data/db
 
+  # Portfolio 5: a separate primary + replica pair. Only started with --profile replication.
+  primary:
+    image: postgres:17
+    container_name: fuelpay-primary
+    profiles: [replication]
+    command: postgres -c hba_file=/etc/postgresql/pg_hba.conf
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - primarydata:/var/lib/postgresql/data
+      - ./portfolio-5-distributed-cloud/replication/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+      - ./portfolio-5-distributed-cloud/replication/replication-role.sql:/docker-entrypoint-initdb.d/replication-role.sql:ro
+
+  replica:
+    image: postgres:17
+    container_name: fuelpay-replica
+    profiles: [replication]
+    user: postgres
+    depends_on: [primary]
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    entrypoint: ["bash", "/start-replica.sh"]
+    volumes:
+      - replicadata:/var/lib/postgresql/data
+      - ./portfolio-5-distributed-cloud/replication/start-replica.sh:/start-replica.sh:ro
+
 volumes:
   pgdata:
   mongodata:
+  primarydata:
+    name: fuelpay-primarydata
+  replicadata:
+    name: fuelpay-replicadata
